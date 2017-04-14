@@ -1,0 +1,44 @@
+struct msgbuf {         //struktura odbierania i wysylania komunikatów
+	long type;	//10-logowanie 12-wylogowanie... ,{1,2,..,9}-obsługa użytkownika
+	char text[200]; //przekazywany sygnał
+};
+
+Wiadomości wysyłane o typie:
+-10 dla logowania odbierane przez serwer
+-100 dla logowania odbierane przez klienta
+(Z góry informuje że podejście to zabrania jednoczesnego logowania na dwóch terminalach,
+trzeba to robic sekwencyjnie, na początku myślałem ze takie podejście wystarczy gdzyż
+głównym celem było pokazanie działających kolejek komunikatów na jednym komputerze, póżniej
+pomyślałem że łatwo można uchronic od tego błędu chciałem użyć semafora aby zablokować możliwość
+modyfikowania "strefy krytycznej" przez dwa programy, ale nie starczyło czasu gdyż miałem poważną 
+grype i mam duże zaległości w nauce do egzaminów nie pozwoliły na ulepszenie tego programu.)
+-dla kolejnych comend wpisywanych przez użytkownika przyjąłem numeracje nr_wiadomosci od 1 do 9 i:
+	*kazda wiadomosc do serwera jest typem 10+nr_wiadomości
+	*kazda wiadmomość od serwera jest typem 100 + (nr_wiadomosci*11)
+tutaj też przydałby sie semafor choc te komendy działają "szybko" tzn nie potrzebuja
+czytania na stdin czy czekania na reakcje uzytkownika, więc bardzo mała szansa ze coś może 
+pójść nie tak.
+-dla wysylania wiadomosci czy do grupy czy do uzytkownika uzytkownik wyslyla wiadomosc:
+	*typem = indeks, (indeks- numer uzytkownika nadawany przez serwer)
+	*address < 10, gdy wysyla do uzytkownika podaje indeks uzytkownika do ktorego wysyla wiadomosc
+	*address > 10, {11,22,33} jest to nr_grupy*11, 
+-gdy jest to wiadomosc dla uzytkownika to serwer swapuje mess.type z mess.address ale:
+	*mess.type = mess.type*111; // pózniej uzytkownik odbiera wiadomosci typu 
+				    // indeks*111 i tu jest pewnosc ze ta wiadomosc jest do niego
+	*gdy ta wiadomosc ma address < 10 to wie ze jest ona od pojedynczego usera
+	*gdy ta wiadomosc ma address > 10 to wie za jest ona od grupy o numerze_grupy*11
+Podejście takie też jest dość słabe co przyznaje, gdyż przyjąłem stałą liczbe uzytkowników = 9.
+Dla mniejszej ilości nie ma problemu ale dla wiekszej ilosci już to nie zadziała. Nie można takze dodawac 
+nowych użytkowników gdyz są oni na stałe wpisani na poczatku przez serwer
+ 
+
+struct message {	//struktura wysyłanych wiadomosci tekstowych do uzytkownika czy grupy
+	long type;	//od kogo
+	char text[400];	//wiadomość
+	int address;	//do kogo <1,9> - pojedynczy użytkownik, {11, 22, 33} - grupa 1, 2 i 3.
+	time_t msgtime; //czas nadawany przez serwer też miewałem problemy z tą funkcją ale stwierdziłem 
+			//ze to nie jest głównym celem tego projektu
+};
+
+Starałem się komentowac kod i myśle że nie ma większego sensu przeklejać więcej informacji z kodu tutaj.
+

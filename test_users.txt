@@ -1,0 +1,18 @@
+test1 pasw1
+test2 pasw2
+test3 pasw3
+test4 pasw4
+test5 pasw5
+test6 pasw6
+test7 pasw7
+test8 pasw8
+test9 pasw9
+1
+1
+0
+2
+2
+0
+3
+3
+0
